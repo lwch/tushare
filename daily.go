@@ -16,7 +16,18 @@ type Tick struct {
 	Turnover float64   // 成交额(千元)
 }
 
-func daily(fields []string, data [][]any) []Tick {
+type dailyOpt func(*Args)
+
+// Daily 获取日线数据
+func (cli *Client) Daily(opts ...dailyOpt) ([]Tick, error) {
+	var args Args
+	for _, o := range opts {
+		o(&args)
+	}
+	fields, data, err := cli.Call("daily", args, []string{"ts_code", "trade_date", "open", "high", "low", "close", "vol", "amount"})
+	if err != nil {
+		return nil, err
+	}
 	var idxCode, idxDate, idxOpen, idxHigh, idxLow, idxClose, idxVolume, idxAmount int
 	for i, field := range fields {
 		switch field {
@@ -52,49 +63,24 @@ func daily(fields []string, data [][]any) []Tick {
 			Turnover: item[idxAmount].(float64),
 		}
 	}
-	return items
+	return items, nil
 }
 
-// DailyByDate 获取指定日期的股票行情数据
-func (cli *Client) DailyByDate(date time.Time) ([]Tick, error) {
-	fields, data, err := cli.Call("daily", Args{
-		"trade_date": date.Format("20060102"),
-	}, []string{"ts_code", "trade_date", "open", "high", "low", "close", "vol", "amount"})
-	if err != nil {
-		return nil, err
+func WithDailyCode(code string) dailyOpt {
+	return func(args *Args) {
+		(*args)["ts_code"] = code
 	}
-	return daily(fields, data), nil
 }
 
-// DailyByCode 获取指定股票的行情数据
-func (cli *Client) DailyByCode(code string) ([]Tick, error) {
-	fields, data, err := cli.Call("daily", Args{
-		"ts_code": code,
-	}, []string{"ts_code", "trade_date", "open", "high", "low", "close", "vol", "amount"})
-	if err != nil {
-		return nil, err
+func WithDailyDate(date time.Time) dailyOpt {
+	return func(args *Args) {
+		(*args)["trade_date"] = date.Format("20060102")
 	}
-	return daily(fields, data), nil
 }
 
-// DailyVIPByDate 获取指定日期的股票行情数据(vip接口)
-func (cli *Client) DailyVIPByDate(date time.Time) ([]Tick, error) {
-	fields, data, err := cli.Call("daily_vip", Args{
-		"trade_date": date.Format("20060102"),
-	}, []string{"ts_code", "trade_date", "open", "high", "low", "close", "vol", "amount"})
-	if err != nil {
-		return nil, err
+func WithDailyDateRange(start, end time.Time) dailyOpt {
+	return func(args *Args) {
+		(*args)["start_date"] = start.Format("20060102")
+		(*args)["end_date"] = end.Format("20060102")
 	}
-	return daily(fields, data), nil
-}
-
-// DailyVIPByCode 获取指定股票的行情数据(vip接口)
-func (cli *Client) DailyVIPByCode(code string) ([]Tick, error) {
-	fields, data, err := cli.Call("daily_vip", Args{
-		"ts_code": code,
-	}, []string{"ts_code", "trade_date", "open", "high", "low", "close", "vol", "amount"})
-	if err != nil {
-		return nil, err
-	}
-	return daily(fields, data), nil
 }
