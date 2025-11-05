@@ -9,13 +9,13 @@ type Adjust struct {
 	Factor float64   // 复权因子
 }
 
-type adjustOpt func(*Args)
+type adjustOpt func(Args)
 
 // AdjFactor 获取复权数据
 func (cli *Client) AdjFactor(opts ...adjustOpt) ([]Adjust, error) {
 	var args Args
 	for _, o := range opts {
-		o(&args)
+		o(args)
 	}
 	fields, data, err := cli.Call("adj_factor", args, []string{"ts_code", "trade_date", "adj_factor"})
 	if err != nil {
@@ -45,20 +45,20 @@ func (cli *Client) AdjFactor(opts ...adjustOpt) ([]Adjust, error) {
 }
 
 func WithAdjustCode(code string) adjustOpt {
-	return func(args *Args) {
-		(*args)["ts_code"] = code
+	return func(args Args) {
+		args["ts_code"] = code
 	}
 }
 
 func WithAdjustDate(date time.Time) adjustOpt {
-	return func(args *Args) {
-		(*args)["trade_date"] = date.Format("20060102")
+	return func(args Args) {
+		args["trade_date"] = date.Format("20060102")
 	}
 }
 
 func WithAdjustDateRange(start, end time.Time) adjustOpt {
-	return func(args *Args) {
-		(*args)["start_date"] = start.Format("20060102")
-		(*args)["end_date"] = end.Format("20060102")
+	return func(args Args) {
+		args["start_date"] = start.Format("20060102")
+		args["end_date"] = end.Format("20060102")
 	}
 }
