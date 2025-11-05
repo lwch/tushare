@@ -39,7 +39,7 @@ func (cli *Client) call(api string, args Args, fields []string) ([]string, [][]a
 		return nil, nil, err
 	}
 	const url = "http://api.tushare.pro"
-	req, err := http.NewRequest(http.MethodPost, url+"/"+api, bytes.NewReader(data))
+	req, err := http.NewRequest(http.MethodPost, url, bytes.NewReader(data))
 	if err != nil {
 		return nil, nil, err
 	}

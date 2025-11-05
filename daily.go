@@ -6,21 +6,24 @@ import (
 
 // Tick 行情数据
 type Tick struct {
-	Code     string  // 股票代码
-	Open     float64 // 开盘价
-	High     float64 // 最高价
-	Low      float64 // 最低价
-	Close    float64 // 收盘价
-	Volume   float64 // 成交量(手)
-	Turnover float64 // 成交额(千元)
+	Code     string    // 股票代码
+	Time     time.Time // 时间
+	Open     float64   // 开盘价
+	High     float64   // 最高价
+	Low      float64   // 最低价
+	Close    float64   // 收盘价
+	Volume   float64   // 成交量(手)
+	Turnover float64   // 成交额(千元)
 }
 
 func daily(fields []string, data [][]any) []Tick {
-	var idxCode, idxOpen, idxHigh, idxLow, idxClose, idxVolume, idxAmount int
+	var idxCode, idxDate, idxOpen, idxHigh, idxLow, idxClose, idxVolume, idxAmount int
 	for i, field := range fields {
 		switch field {
 		case "ts_code":
 			idxCode = i
+		case "trade_date":
+			idxDate = i
 		case "open":
 			idxOpen = i
 		case "high":
@@ -37,8 +40,10 @@ func daily(fields []string, data [][]any) []Tick {
 	}
 	items := make([]Tick, len(data))
 	for i, item := range data {
+		date, _ := time.ParseInLocation("20060102", item[idxDate].(string), time.Local)
 		items[i] = Tick{
 			Code:     item[idxCode].(string),
+			Time:     date,
 			Open:     item[idxOpen].(float64),
 			High:     item[idxHigh].(float64),
 			Low:      item[idxLow].(float64),
@@ -54,7 +59,7 @@ func daily(fields []string, data [][]any) []Tick {
 func (cli *Client) DailyByDate(date time.Time) ([]Tick, error) {
 	fields, data, err := cli.Call("daily", Args{
 		"trade_date": date.Format("20060102"),
-	}, []string{"ts_code", "open", "high", "low", "close", "vol", "amount"})
+	}, []string{"ts_code", "trade_date", "open", "high", "low", "close", "vol", "amount"})
 	if err != nil {
 		return nil, err
 	}
@@ -65,7 +70,7 @@ func (cli *Client) DailyByDate(date time.Time) ([]Tick, error) {
 func (cli *Client) DailyByCode(code string) ([]Tick, error) {
 	fields, data, err := cli.Call("daily", Args{
 		"ts_code": code,
-	}, []string{"ts_code", "open", "high", "low", "close", "vol", "amount"})
+	}, []string{"ts_code", "trade_date", "open", "high", "low", "close", "vol", "amount"})
 	if err != nil {
 		return nil, err
 	}
@@ -76,7 +81,7 @@ func (cli *Client) DailyByCode(code string) ([]Tick, error) {
 func (cli *Client) DailyVIPByDate(date time.Time) ([]Tick, error) {
 	fields, data, err := cli.Call("daily_vip", Args{
 		"trade_date": date.Format("20060102"),
-	}, []string{"ts_code", "open", "high", "low", "close", "vol", "amount"})
+	}, []string{"ts_code", "trade_date", "open", "high", "low", "close", "vol", "amount"})
 	if err != nil {
 		return nil, err
 	}
@@ -87,7 +92,7 @@ func (cli *Client) DailyVIPByDate(date time.Time) ([]Tick, error) {
 func (cli *Client) DailyVIPByCode(code string) ([]Tick, error) {
 	fields, data, err := cli.Call("daily_vip", Args{
 		"ts_code": code,
-	}, []string{"ts_code", "open", "high", "low", "close", "vol", "amount"})
+	}, []string{"ts_code", "trade_date", "open", "high", "low", "close", "vol", "amount"})
 	if err != nil {
 		return nil, err
 	}
