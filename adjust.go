@@ -13,7 +13,7 @@ type adjustOpt func(Args)
 
 // AdjFactor 获取复权数据
 func (cli *Client) AdjFactor(opts ...adjustOpt) ([]Adjust, error) {
-	var args Args
+	args := make(Args)
 	for _, o := range opts {
 		o(args)
 	}

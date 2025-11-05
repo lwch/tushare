@@ -20,7 +20,7 @@ type dailyOpt func(Args)
 
 // Daily 获取日线数据
 func (cli *Client) Daily(opts ...dailyOpt) ([]Tick, error) {
-	var args Args
+	args := make(Args)
 	for _, o := range opts {
 		o(args)
 	}
