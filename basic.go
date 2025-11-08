@@ -1,3 +1,5 @@
+// https://tushare.pro/document/2?doc_id=25
+
 package tushare
 
 // StockBasic 股票基本信息

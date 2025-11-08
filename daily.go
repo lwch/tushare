@@ -1,3 +1,5 @@
+// https://tushare.pro/document/2?doc_id=27
+
 package tushare
 
 import (
@@ -100,18 +102,21 @@ func (cli *Client) DailyVip(opts ...dailyOpt) ([]DailyTick, error) {
 	return cli.daily("daily_vip", opts...)
 }
 
+// WithDailyCode 按股票代码查询
 func WithDailyCode(code string) dailyOpt {
 	return func(args Args) {
 		args["ts_code"] = code
 	}
 }
 
+// WithDailyDate 按交易日期查询
 func WithDailyDate(date time.Time) dailyOpt {
 	return func(args Args) {
 		args["trade_date"] = date.Format("20060102")
 	}
 }
 
+// WithDailyDateRange 按交易日期范围查询
 func WithDailyDateRange(start, end time.Time) dailyOpt {
 	return func(args Args) {
 		args["start_date"] = start.Format("20060102")
