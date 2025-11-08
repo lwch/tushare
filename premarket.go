@@ -64,23 +64,23 @@ func (cli *Client) PreMarket(opts ...preMarketOpt) ([]PreMarket, error) {
 }
 
 // WithPreMarketCode 按股票代码查询
-func WithPreMarketCode(symbol string) preMarketOpt {
+func WithPreMarketCode(code string) preMarketOpt {
 	return func(args Args) {
-		args["ts_code"] = symbol
+		args["ts_code"] = code
 	}
 }
 
 // WithPreMarketDate 按交易日期查询
-func WithPreMarketDate(date string) preMarketOpt {
+func WithPreMarketDate(date time.Time) preMarketOpt {
 	return func(args Args) {
-		args["trade_date"] = date
+		args["trade_date"] = date.Format("20060102")
 	}
 }
 
 // WithPreMarketDateRange 按开始交易日期查询
-func WithPreMarketDateRange(begin, end string) preMarketOpt {
+func WithPreMarketDateRange(begin, end time.Time) preMarketOpt {
 	return func(args Args) {
-		args["start_date"] = begin
-		args["end_date"] = end
+		args["start_date"] = begin.Format("20060102")
+		args["end_date"] = end.Format("20060102")
 	}
 }
