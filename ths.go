@@ -101,6 +101,13 @@ const ThsIndexTypeST thsIndexType = "ST" // 同花顺风格指数
 const ThsIndexTypeTH thsIndexType = "TH" // 同花顺主题指数
 const ThsIndexTypeBB thsIndexType = "BB" // 同花顺宽基指数
 
+// WithThsIndexType 指数类型参数
+func WithThsIndexType(indexType thsIndexType) thsIndexOpt {
+	return func(args Args) {
+		args["type"] = indexType
+	}
+}
+
 // https://tushare.pro/document/2?doc_id=261
 
 // ThsMember 同花顺行业成分股
