@@ -2,7 +2,8 @@ package tushare
 
 // StockBasic 股票基本信息
 type StockBasic struct {
-	Symbol   string // 股票代码
+	Code     string // 股票代码
+	Symbol   string // 股票代码(无后缀)
 	Name     string // 股票名称
 	Area     string // 地域
 	Industry string // 行业
@@ -17,13 +18,15 @@ func (cli *Client) StockBasic(opts ...basicOpt) ([]StockBasic, error) {
 		o(args)
 	}
 	fields, data, err := cli.Call("stock_basic", args,
-		[]string{"symbol", "name", "area", "industry"})
+		[]string{"ts_code", "symbol", "name", "area", "industry"})
 	if err != nil {
 		return nil, err
 	}
-	var idxSymbol, idxName, idxArea, idxIndustry int
+	var idxCode, idxSymbol, idxName, idxArea, idxIndustry int
 	for i, field := range fields {
 		switch field {
+		case "ts_code":
+			idxCode = i
 		case "symbol":
 			idxSymbol = i
 		case "name":
@@ -43,6 +46,7 @@ func (cli *Client) StockBasic(opts ...basicOpt) ([]StockBasic, error) {
 	}
 	for i, item := range data {
 		items[i] = StockBasic{
+			Code:     toString(item[idxCode]),
 			Symbol:   toString(item[idxSymbol]),
 			Name:     toString(item[idxName]),
 			Area:     toString(item[idxArea]),
