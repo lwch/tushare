@@ -11,6 +11,7 @@ type ThsIndex struct {
 	Count    int       // 成分股数量
 	Exchange string    // 交易所代码
 	Date     time.Time // 上市日期
+	Type     string    // 指数类型
 }
 
 type thsIndexOpt func(Args)
@@ -22,11 +23,11 @@ func (cli *Client) ThsIndex(opts ...thsIndexOpt) ([]ThsIndex, error) {
 		o(args)
 	}
 	fields, data, err := cli.Call("ths_index", args,
-		[]string{"ts_code", "name", "count", "exchange", "list_date"})
+		[]string{"ts_code", "name", "count", "exchange", "list_date", "type"})
 	if err != nil {
 		return nil, err
 	}
-	var idxCode, idxName, idxCount, idxExchange, idxDate int
+	var idxCode, idxName, idxCount, idxExchange, idxDate, idxType int
 	for i, field := range fields {
 		switch field {
 		case "ts_code":
@@ -39,6 +40,8 @@ func (cli *Client) ThsIndex(opts ...thsIndexOpt) ([]ThsIndex, error) {
 			idxExchange = i
 		case "list_date":
 			idxDate = i
+		case "type":
+			idxType = i
 		}
 	}
 	toString := func(v any) string {
@@ -62,6 +65,7 @@ func (cli *Client) ThsIndex(opts ...thsIndexOpt) ([]ThsIndex, error) {
 			Count:    toInt(item[idxCount]),
 			Exchange: item[idxExchange].(string),
 			Date:     date,
+			Type:     item[idxType].(string),
 		}
 	}
 	return items, nil
@@ -86,6 +90,16 @@ func WithThsIndexExchange(exchange thsIndexExchange) thsIndexOpt {
 		args["exchange"] = exchange
 	}
 }
+
+type thsIndexType string
+
+const ThsIndexTypeN thsIndexType = "N"   // 概念指数
+const ThsIndexTypeI thsIndexType = "I"   // 行业指数
+const ThsIndexTypeR thsIndexType = "R"   // 地域指数
+const ThsIndexTypeS thsIndexType = "S"   // 同花顺特色指数
+const ThsIndexTypeST thsIndexType = "ST" // 同花顺风格指数
+const ThsIndexTypeTH thsIndexType = "TH" // 同花顺主题指数
+const ThsIndexTypeBB thsIndexType = "BB" // 同花顺宽基指数
 
 // https://tushare.pro/document/2?doc_id=261
 
