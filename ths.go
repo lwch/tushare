@@ -47,13 +47,19 @@ func (cli *Client) ThsIndex(opts ...thsIndexOpt) ([]ThsIndex, error) {
 		}
 		return v.(string)
 	}
+	toInt := func(v any) int {
+		if v == nil {
+			return 0
+		}
+		return int(v.(float64))
+	}
 	items := make([]ThsIndex, len(data))
 	for i, item := range data {
 		date, _ := time.ParseInLocation("20060102", toString(item[idxDate]), time.Local)
 		items[i] = ThsIndex{
 			Code:     item[idxCode].(string),
 			Name:     item[idxName].(string),
-			Count:    int(item[idxCount].(float64)),
+			Count:    toInt(item[idxCount]),
 			Exchange: item[idxExchange].(string),
 			Date:     date,
 		}
