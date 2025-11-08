@@ -23,7 +23,7 @@ func (cli *Client) PreMarket(opts ...preMarketOpt) ([]PreMarket, error) {
 	for _, o := range opts {
 		o(args)
 	}
-	fields, data, err := cli.Call("pre_market", args,
+	fields, data, err := cli.Call("stk_premarket", args,
 		[]string{"ts_code", "trade_date", "total_share", "float_share", "pre_close", "up_limit", "down_limit"})
 	if err != nil {
 		return nil, err
