@@ -71,6 +71,12 @@ func (cli *Client) daily(api string, opts ...dailyOpt) ([]DailyTick, error) {
 		}
 	}
 	items := make([]DailyTick, len(data))
+	toFloat := func(v any) float64 {
+		if v == nil {
+			return 0
+		}
+		return v.(float64)
+	}
 	for i, item := range data {
 		date, _ := time.ParseInLocation("20060102", item[idxDate].(string), time.Local)
 		items[i] = DailyTick{
@@ -82,7 +88,7 @@ func (cli *Client) daily(api string, opts ...dailyOpt) ([]DailyTick, error) {
 				Low:      item[idxLow].(float64),
 				Close:    item[idxClose].(float64),
 				Volume:   item[idxVolume].(float64),
-				Turnover: item[idxAmount].(float64),
+				Turnover: toFloat(item[idxAmount]),
 			},
 			PreClose: item[idxPreClose].(float64),
 			Change:   item[idxChange].(float64),
