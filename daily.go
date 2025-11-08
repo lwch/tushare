@@ -16,19 +16,32 @@ type Tick struct {
 	Turnover float64   // 成交额(千元)
 }
 
+type DailyTick struct {
+	Tick
+	PreClose float64 // 昨收价
+	Change   float64 // 涨跌额
+	PctChg   float64 // 涨跌幅
+}
+
 type dailyOpt func(Args)
 
-// Daily 获取日线数据
-func (cli *Client) Daily(opts ...dailyOpt) ([]Tick, error) {
+func (cli *Client) daily(api string, opts ...dailyOpt) ([]DailyTick, error) {
 	args := make(Args)
 	for _, o := range opts {
 		o(args)
 	}
-	fields, data, err := cli.Call("daily", args, []string{"ts_code", "trade_date", "open", "high", "low", "close", "vol", "amount"})
+	fields, data, err := cli.Call(api, args, []string{
+		"ts_code", "trade_date",
+		"open", "high", "low", "close",
+		"pre_close", "change", "pct_chg",
+		"vol", "amount"})
 	if err != nil {
 		return nil, err
 	}
-	var idxCode, idxDate, idxOpen, idxHigh, idxLow, idxClose, idxVolume, idxAmount int
+	var idxCode, idxDate int
+	var idxOpen, idxHigh, idxLow, idxClose int
+	var idxPreClose, idxChange, idxPctChg int
+	var idxVolume, idxAmount int
 	for i, field := range fields {
 		switch field {
 		case "ts_code":
@@ -43,27 +56,48 @@ func (cli *Client) Daily(opts ...dailyOpt) ([]Tick, error) {
 			idxLow = i
 		case "close":
 			idxClose = i
+		case "pre_close":
+			idxPreClose = i
+		case "change":
+			idxChange = i
+		case "pct_chg":
+			idxPctChg = i
 		case "vol":
 			idxVolume = i
 		case "amount":
 			idxAmount = i
 		}
 	}
-	items := make([]Tick, len(data))
+	items := make([]DailyTick, len(data))
 	for i, item := range data {
 		date, _ := time.ParseInLocation("20060102", item[idxDate].(string), time.Local)
-		items[i] = Tick{
-			Code:     item[idxCode].(string),
-			Time:     date,
-			Open:     item[idxOpen].(float64),
-			High:     item[idxHigh].(float64),
-			Low:      item[idxLow].(float64),
-			Close:    item[idxClose].(float64),
-			Volume:   item[idxVolume].(float64),
-			Turnover: item[idxAmount].(float64),
+		items[i] = DailyTick{
+			Tick: Tick{
+				Code:     item[idxCode].(string),
+				Time:     date,
+				Open:     item[idxOpen].(float64),
+				High:     item[idxHigh].(float64),
+				Low:      item[idxLow].(float64),
+				Close:    item[idxClose].(float64),
+				Volume:   item[idxVolume].(float64),
+				Turnover: item[idxAmount].(float64),
+			},
+			PreClose: item[idxPreClose].(float64),
+			Change:   item[idxChange].(float64),
+			PctChg:   item[idxPctChg].(float64),
 		}
 	}
 	return items, nil
+}
+
+// Daily 获取日线数据
+func (cli *Client) Daily(opts ...dailyOpt) ([]DailyTick, error) {
+	return cli.daily("daily", opts...)
+}
+
+// DailyVip 获取VIP日线数据
+func (cli *Client) DailyVip(opts ...dailyOpt) ([]DailyTick, error) {
+	return cli.daily("daily_vip", opts...)
 }
 
 func WithDailyCode(code string) dailyOpt {

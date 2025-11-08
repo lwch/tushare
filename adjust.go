@@ -11,13 +11,12 @@ type Adjust struct {
 
 type adjustOpt func(Args)
 
-// AdjFactor 获取复权数据
-func (cli *Client) AdjFactor(opts ...adjustOpt) ([]Adjust, error) {
+func (cli *Client) adjFactor(api string, opts ...adjustOpt) ([]Adjust, error) {
 	args := make(Args)
 	for _, o := range opts {
 		o(args)
 	}
-	fields, data, err := cli.Call("adj_factor", args, []string{"ts_code", "trade_date", "adj_factor"})
+	fields, data, err := cli.Call(api, args, []string{"ts_code", "trade_date", "adj_factor"})
 	if err != nil {
 		return nil, err
 	}
@@ -42,6 +41,16 @@ func (cli *Client) AdjFactor(opts ...adjustOpt) ([]Adjust, error) {
 		}
 	}
 	return items, nil
+}
+
+// AdjFactor 获取复权数据
+func (cli *Client) AdjFactor(opts ...adjustOpt) ([]Adjust, error) {
+	return cli.adjFactor("adj_factor", opts...)
+}
+
+// AdjFactorVip 获取VIP复权数据
+func (cli *Client) AdjFactorVip(opts ...adjustOpt) ([]Adjust, error) {
+	return cli.adjFactor("adj_factor_vip", opts...)
 }
 
 func WithAdjustCode(code string) adjustOpt {
