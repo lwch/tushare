@@ -240,8 +240,8 @@ func (cli *Client) ThsDaily(opts ...thsDailyOpt) ([]DailyTick, error) {
 	return items, nil
 }
 
-// WithThsDailyIndexCode 同花顺行业指数代码参数
-func WithThsDailyIndexCode(code string) thsDailyOpt {
+// WithThsDailyCode 同花顺行业指数代码参数
+func WithThsDailyCode(code string) thsDailyOpt {
 	return func(args Args) {
 		args["ts_code"] = code
 	}
