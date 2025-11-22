@@ -4,11 +4,11 @@ package tushare
 
 // IndexBasic 指数基本信息
 type IndexBasic struct {
-	Code     string      // 指数代码
-	Name     string      // 指数名称
-	FullName string      // 指数全称
-	Market   indexMarket // 市场
-	Category string      // 分类
+	Code     string        // 指数代码
+	Name     string        // 指数名称
+	FullName string        // 指数全称
+	Market   indexMarket   // 市场
+	Category indexCategory // 分类
 }
 
 type indexBasicOpt func(Args)
@@ -52,7 +52,7 @@ func (cli *Client) IndexBasic(opts ...indexBasicOpt) ([]IndexBasic, error) {
 			Name:     toString(item[idxName]),
 			FullName: toString(item[idxFullName]),
 			Market:   indexMarket(toString(item[idxMarket])),
-			Category: toString(item[idxCategory]),
+			Category: indexCategory(toString(item[idxCategory])),
 		}
 	}
 	return items, nil
@@ -68,6 +68,22 @@ const (
 	IndexMarketCICC  indexMarket = "CICC" // 中金所
 	IndexMarketSW    indexMarket = "SW"   // 申万行业
 	IndexMarketOTHER indexMarket = "OTH"  // 其他
+)
+
+type indexCategory string
+
+const (
+	IndexCategory行业指数   indexCategory = "行业指数"
+	IndexCategory一级行业指数 indexCategory = "一级行业指数"
+	IndexCategory二级行业指数 indexCategory = "二级行业指数"
+	IndexCategory三级行业指数 indexCategory = "三级行业指数"
+	IndexCategory四级行业指数 indexCategory = "四级行业指数"
+	IndexCategory综合指数   indexCategory = "综合指数"
+	IndexCategory主题指数   indexCategory = "主题指数"
+	IndexCategory策略指数   indexCategory = "策略指数"
+	IndexCategory规模指数   indexCategory = "规模指数"
+	IndexCategory风格指数   indexCategory = "风格指数"
+	IndexCategory其他指数   indexCategory = "其他"
 )
 
 // WithIndexBasicCode 按指数代码查询
@@ -92,7 +108,7 @@ func WithIndexBasicMarket(market indexMarket) indexBasicOpt {
 }
 
 // WithIndexBasicCategory 按指数分类查询
-func WithIndexBasicCategory(category string) indexBasicOpt {
+func WithIndexBasicCategory(category indexCategory) indexBasicOpt {
 	return func(args Args) {
 		args["category"] = category
 	}
