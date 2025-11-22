@@ -178,14 +178,14 @@ func (cli *Client) ThsDaily(opts ...thsDailyOpt) ([]DailyTick, error) {
 		"ts_code", "trade_date",
 		"open", "high", "low", "close",
 		"pre_close", "change", "pct_chg",
-		"vol", "amount"})
+		"vol"})
 	if err != nil {
 		return nil, err
 	}
 	var idxCode, idxDate int
 	var idxOpen, idxHigh, idxLow, idxClose int
 	var idxPreClose, idxChange, idxPctChg int
-	var idxVolume, idxAmount int
+	var idxVolume int
 	for i, field := range fields {
 		switch field {
 		case "ts_code":
@@ -208,8 +208,6 @@ func (cli *Client) ThsDaily(opts ...thsDailyOpt) ([]DailyTick, error) {
 			idxPctChg = i
 		case "vol":
 			idxVolume = i
-		case "amount":
-			idxAmount = i
 		}
 	}
 	items := make([]DailyTick, len(data))
@@ -223,14 +221,13 @@ func (cli *Client) ThsDaily(opts ...thsDailyOpt) ([]DailyTick, error) {
 		date, _ := time.ParseInLocation("20060102", item[idxDate].(string), time.Local)
 		items[i] = DailyTick{
 			Tick: Tick{
-				Code:     item[idxCode].(string),
-				Time:     date,
-				Open:     toFloat(item[idxOpen]),
-				High:     toFloat(item[idxHigh]),
-				Low:      toFloat(item[idxLow]),
-				Close:    toFloat(item[idxClose]),
-				Volume:   toFloat(item[idxVolume]),
-				Turnover: toFloat(item[idxAmount]),
+				Code:   item[idxCode].(string),
+				Time:   date,
+				Open:   toFloat(item[idxOpen]),
+				High:   toFloat(item[idxHigh]),
+				Low:    toFloat(item[idxLow]),
+				Close:  toFloat(item[idxClose]),
+				Volume: toFloat(item[idxVolume]),
 			},
 			PreClose: toFloat(item[idxPreClose]),
 			Change:   toFloat(item[idxChange]),
