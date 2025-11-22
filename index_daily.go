@@ -70,7 +70,7 @@ func (cli *Client) IndexDaily(opts ...indexDailyOpt) ([]DailyTick, error) {
 				Volume:   item[idxVolume].(float64),
 				Turnover: toFloat(item[idxAmount]),
 			},
-			PreClose: item[idxPreClose].(float64),
+			PreClose: toFloat(item[idxPreClose]),
 			Change:   item[idxChange].(float64),
 			PctChg:   item[idxPctChg].(float64),
 		}
