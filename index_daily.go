@@ -71,8 +71,8 @@ func (cli *Client) IndexDaily(opts ...indexDailyOpt) ([]DailyTick, error) {
 				Turnover: toFloat(item[idxAmount]),
 			},
 			PreClose: toFloat(item[idxPreClose]),
-			Change:   item[idxChange].(float64),
-			PctChg:   item[idxPctChg].(float64),
+			Change:   toFloat(item[idxChange]),
+			PctChg:   toFloat(item[idxPctChg]),
 		}
 	}
 	return items, nil
