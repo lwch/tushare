@@ -204,7 +204,7 @@ func (cli *Client) ThsDaily(opts ...thsDailyOpt) ([]DailyTick, error) {
 			idxPreClose = i
 		case "change":
 			idxChange = i
-		case "pct_chg":
+		case "pct_change":
 			idxPctChg = i
 		case "vol":
 			idxVolume = i
