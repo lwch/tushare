@@ -165,3 +165,99 @@ func WithThsMemberStockCode(code string) thsMemberOpt {
 		args["con_code"] = code
 	}
 }
+
+type thsDailyOpt func(Args)
+
+// ThsDaily 同花顺行业指数日线行情
+func (cli *Client) ThsDaily(opts ...thsDailyOpt) ([]DailyTick, error) {
+	args := make(Args)
+	for _, o := range opts {
+		o(args)
+	}
+	fields, data, err := cli.Call("ths_daily", args, []string{
+		"ts_code", "trade_date",
+		"open", "high", "low", "close",
+		"pre_close", "change", "pct_chg",
+		"vol", "amount"})
+	if err != nil {
+		return nil, err
+	}
+	var idxCode, idxDate int
+	var idxOpen, idxHigh, idxLow, idxClose int
+	var idxPreClose, idxChange, idxPctChg int
+	var idxVolume, idxAmount int
+	for i, field := range fields {
+		switch field {
+		case "ts_code":
+			idxCode = i
+		case "trade_date":
+			idxDate = i
+		case "open":
+			idxOpen = i
+		case "high":
+			idxHigh = i
+		case "low":
+			idxLow = i
+		case "close":
+			idxClose = i
+		case "pre_close":
+			idxPreClose = i
+		case "change":
+			idxChange = i
+		case "pct_chg":
+			idxPctChg = i
+		case "vol":
+			idxVolume = i
+		case "amount":
+			idxAmount = i
+		}
+	}
+	items := make([]DailyTick, len(data))
+	toFloat := func(v any) float64 {
+		if v == nil {
+			return 0
+		}
+		return v.(float64)
+	}
+	for i, item := range data {
+		date, _ := time.ParseInLocation("20060102", item[idxDate].(string), time.Local)
+		items[i] = DailyTick{
+			Tick: Tick{
+				Code:     item[idxCode].(string),
+				Time:     date,
+				Open:     toFloat(item[idxOpen]),
+				High:     toFloat(item[idxHigh]),
+				Low:      toFloat(item[idxLow]),
+				Close:    toFloat(item[idxClose]),
+				Volume:   toFloat(item[idxVolume]),
+				Turnover: toFloat(item[idxAmount]),
+			},
+			PreClose: toFloat(item[idxPreClose]),
+			Change:   toFloat(item[idxChange]),
+			PctChg:   toFloat(item[idxPctChg]),
+		}
+	}
+	return items, nil
+}
+
+// WithThsDailyIndexCode 同花顺行业指数代码参数
+func WithThsDailyIndexCode(code string) thsDailyOpt {
+	return func(args Args) {
+		args["ts_code"] = code
+	}
+}
+
+// WithThsDailyDate 按日期查询
+func WithThsDailyDate(date time.Time) thsDailyOpt {
+	return func(args Args) {
+		args["trade_date"] = date.Format("20060102")
+	}
+}
+
+// WithThsDailyDateRange 按日期范围查询
+func WithThsDailyDateRange(start, end time.Time) thsDailyOpt {
+	return func(args Args) {
+		args["start_date"] = start.Format("20060102")
+		args["end_date"] = end.Format("20060102")
+	}
+}
