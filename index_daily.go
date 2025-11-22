@@ -1,39 +1,18 @@
-// https://tushare.pro/document/2?doc_id=27
+// https://tushare.pro/document/2?doc_id=95
 
 package tushare
 
-import (
-	"time"
-)
+import "time"
 
-// Tick 行情数据
-type Tick struct {
-	Code     string    // 股票代码
-	Time     time.Time // 时间
-	Open     float64   // 开盘价
-	High     float64   // 最高价
-	Low      float64   // 最低价
-	Close    float64   // 收盘价
-	Volume   float64   // 成交量(手)
-	Turnover float64   // 成交额(千元)
-}
+type indexDailyOpt func(Args)
 
-// DailyTick 日线数据
-type DailyTick struct {
-	Tick
-	PreClose float64 // 昨收价
-	Change   float64 // 涨跌额
-	PctChg   float64 // 涨跌幅
-}
-
-type dailyOpt func(Args)
-
-func (cli *Client) daily(api string, opts ...dailyOpt) ([]DailyTick, error) {
+// IndexDaily 指数日线行情
+func (cli *Client) IndexDaily(opts ...indexDailyOpt) ([]DailyTick, error) {
 	args := make(Args)
 	for _, o := range opts {
 		o(args)
 	}
-	fields, data, err := cli.Call(api, args, []string{
+	fields, data, err := cli.Call("index_daily", args, []string{
 		"ts_code", "trade_date",
 		"open", "high", "low", "close",
 		"pre_close", "change", "pct_chg",
@@ -99,32 +78,22 @@ func (cli *Client) daily(api string, opts ...dailyOpt) ([]DailyTick, error) {
 	return items, nil
 }
 
-// Daily 获取日线数据
-func (cli *Client) Daily(opts ...dailyOpt) ([]DailyTick, error) {
-	return cli.daily("daily", opts...)
-}
-
-// DailyVip 获取VIP日线数据
-func (cli *Client) DailyVip(opts ...dailyOpt) ([]DailyTick, error) {
-	return cli.daily("daily_vip", opts...)
-}
-
-// WithDailyCode 按股票代码查询
-func WithDailyCode(code string) dailyOpt {
+// WithIndexDailyCode 按指数代码查询
+func WithIndexDailyCode(code string) indexDailyOpt {
 	return func(args Args) {
 		args["ts_code"] = code
 	}
 }
 
-// WithDailyDate 按交易日期查询
-func WithDailyDate(date time.Time) dailyOpt {
+// WithIndexDailyDate 按交易日期查询
+func WithIndexDailyDate(date time.Time) indexDailyOpt {
 	return func(args Args) {
 		args["trade_date"] = date.Format("20060102")
 	}
 }
 
-// WithDailyDateRange 按交易日期范围查询
-func WithDailyDateRange(start, end time.Time) dailyOpt {
+// WithIndexDailyDateRange 按交易日期范围查询
+func WithIndexDailyDateRange(start, end time.Time) indexDailyOpt {
 	return func(args Args) {
 		args["start_date"] = start.Format("20060102")
 		args["end_date"] = end.Format("20060102")
