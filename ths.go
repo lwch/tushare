@@ -177,7 +177,7 @@ func (cli *Client) ThsDaily(opts ...thsDailyOpt) ([]DailyTick, error) {
 	fields, data, err := cli.Call("ths_daily", args, []string{
 		"ts_code", "trade_date",
 		"open", "high", "low", "close",
-		"pre_close", "change", "pct_chg",
+		"pre_close", "change", "pct_change",
 		"vol"})
 	if err != nil {
 		return nil, err
