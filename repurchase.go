@@ -3,7 +3,6 @@
 package tushare
 
 import (
-	"strconv"
 	"time"
 )
 
@@ -28,7 +27,7 @@ func (cli *Client) Repurchase(opts ...repurchaseOpt) ([]Repurchase, error) {
 	for _, o := range opts {
 		o(args)
 	}
-	fields, data, err := cli.Call("repurchase", args, []string{"ts_code", "ann_date", "end_date", "exp_date", "proc", "volume", "amount", "high_limit", "low_limit"})
+	fields, data, err := cli.Call("repurchase", args, []string{"ts_code", "ann_date", "end_date", "exp_date", "proc", "vol", "amount", "high_limit", "low_limit"})
 	if err != nil {
 		return nil, err
 	}
@@ -45,7 +44,7 @@ func (cli *Client) Repurchase(opts ...repurchaseOpt) ([]Repurchase, error) {
 			idxExpDate = i
 		case "proc":
 			idxProc = i
-		case "volume":
+		case "vol":
 			idxVolume = i
 		case "amount":
 			idxAmount = i
@@ -66,18 +65,7 @@ func (cli *Client) Repurchase(opts ...repurchaseOpt) ([]Repurchase, error) {
 		if v == nil {
 			return 0
 		}
-		switch val := v.(type) {
-		case float64:
-			return val
-		case string:
-			n, err := strconv.ParseFloat(val, 64)
-			if err == nil {
-				return n
-			}
-			return 0
-		default:
-			return 0
-		}
+		return v.(float64)
 	}
 	items := make([]Repurchase, len(data))
 	for i, item := range data {
