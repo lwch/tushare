@@ -2,7 +2,10 @@
 
 package tushare
 
-import "time"
+import (
+	"strconv"
+	"time"
+)
 
 // Repurchase 股票回购数据
 type Repurchase struct {
@@ -59,6 +62,23 @@ func (cli *Client) Repurchase(opts ...repurchaseOpt) ([]Repurchase, error) {
 		t, _ := time.ParseInLocation("20060102", v.(string), time.Local)
 		return t
 	}
+	toFloat64 := func(v any) float64 {
+		if v == nil {
+			return 0
+		}
+		switch val := v.(type) {
+		case float64:
+			return val
+		case string:
+			n, err := strconv.ParseFloat(val, 64)
+			if err == nil {
+				return n
+			}
+			return 0
+		default:
+			return 0
+		}
+	}
 	items := make([]Repurchase, len(data))
 	for i, item := range data {
 		items[i] = Repurchase{
@@ -67,10 +87,10 @@ func (cli *Client) Repurchase(opts ...repurchaseOpt) ([]Repurchase, error) {
 			EndDate: toDate(item[idxEndDate]),
 			ExpDate: toDate(item[idxExpDate]),
 			Proc:    repurchaseProc(item[idxProc].(string)),
-			Volume:  item[idxVolume].(float64),
-			Amount:  item[idxAmount].(float64),
-			High:    item[idxHigh].(float64),
-			Low:     item[idxLow].(float64),
+			Volume:  toFloat64(item[idxVolume]),
+			Amount:  toFloat64(item[idxAmount]),
+			High:    toFloat64(item[idxHigh]),
+			Low:     toFloat64(item[idxLow]),
 		}
 	}
 	return items, nil
