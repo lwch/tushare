@@ -4,26 +4,26 @@ package tushare
 
 import "time"
 
-// FundBasic 基金基本信息
-type FundBasic struct {
-	Code      string       // 基金代码
-	Name      string       // 基金名称
-	IndexCode string       // 关联指数代码
-	IndexName string       // 关联指数名称
-	Date      time.Time    // 上市日期
-	Status    fundStatus   // 基金状态
-	Exchange  fundExchange // 交易所
+// ETFBasic 获取ETF列表
+type ETFBasic struct {
+	Code      string      // ETF代码
+	Name      string      // ETF名称
+	IndexCode string      // 关联指数代码
+	IndexName string      // 关联指数名称
+	Date      time.Time   // 上市日期
+	Status    etfStatus   // ETF状态
+	Exchange  etfExchange // 交易所
 }
 
-type fundOpt func(Args)
+type etfOpt func(Args)
 
-// FundBasic 获取基金列表
-func (cli *Client) FundBasic(opts ...fundOpt) ([]FundBasic, error) {
+// ETFBasic 获取ETF列表
+func (cli *Client) ETFBasic(opts ...etfOpt) ([]ETFBasic, error) {
 	args := make(Args)
 	for _, o := range opts {
 		o(args)
 	}
-	fields, data, err := cli.Call("fund_basic", args,
+	fields, data, err := cli.Call("etf_basic", args,
 		[]string{"ts_code", "csname", "index_code", "index_name", "list_date", "list_status", "exchange"})
 	if err != nil {
 		return nil, err
@@ -47,7 +47,7 @@ func (cli *Client) FundBasic(opts ...fundOpt) ([]FundBasic, error) {
 			idxExchange = i
 		}
 	}
-	items := make([]FundBasic, len(data))
+	items := make([]ETFBasic, len(data))
 	toString := func(v any) string {
 		if v == nil {
 			return ""
@@ -63,60 +63,60 @@ func (cli *Client) FundBasic(opts ...fundOpt) ([]FundBasic, error) {
 		return t
 	}
 	for i, item := range data {
-		items[i] = FundBasic{
+		items[i] = ETFBasic{
 			Code:      toString(item[idxCode]),
 			Name:      toString(item[idxName]),
 			IndexCode: toString(item[idxIndexCode]),
 			IndexName: toString(item[idxIndexName]),
 			Date:      toDate(item[idxDate]),
-			Status:    fundStatus(toString(item[idxStatus])),
-			Exchange:  fundExchange(toString(item[idxExchange])),
+			Status:    etfStatus(toString(item[idxStatus])),
+			Exchange:  etfExchange(toString(item[idxExchange])),
 		}
 	}
 	return items, nil
 }
 
-// WithFundCode 按基金代码查询
-func WithFundCode(code string) fundOpt {
+// WithETFCode 按ETF代码查询
+func WithETFCode(code string) etfOpt {
 	return func(args Args) {
 		args["ts_code"] = code
 	}
 }
 
-// WithIndexCode 按关联指数代码查询
-func WithIndexCode(indexCode string) fundOpt {
+// WithETFIndexCode 按关联指数代码查询
+func WithETFIndexCode(indexCode string) etfOpt {
 	return func(args Args) {
 		args["index_code"] = indexCode
 	}
 }
 
-// WithDate 按上市日期查询
-func WithDate(date time.Time) fundOpt {
+// WithETFDate 按上市日期查询
+func WithETFDate(date time.Time) etfOpt {
 	return func(args Args) {
 		args["list_date"] = date.Format("20060102")
 	}
 }
 
-type fundStatus string
+type etfStatus string
 
-const FundStatusL fundStatus = "L" // 上市
-const FundStatusD fundStatus = "D" // 退市
-const FundStatusP fundStatus = "P" // 待上市
+const ETFStatusL etfStatus = "L" // 上市
+const ETFStatusD etfStatus = "D" // 退市
+const ETFStatusP etfStatus = "P" // 待上市
 
-// WithFundStatus 按基金状态查询(上市/退市/待上市)
-func WithFundStatus(status fundStatus) fundOpt {
+// WithETFStatus 按基金状态查询(上市/退市/待上市)
+func WithETFStatus(status etfStatus) etfOpt {
 	return func(args Args) {
 		args["list_status"] = status
 	}
 }
 
-type fundExchange string
+type etfExchange string
 
-const FundExchangeSSE fundExchange = "SSE" // 上交所
-const FundExchangeSZ fundExchange = "SZ"   // 深交所
+const ETFExchangeSSE etfExchange = "SSE" // 上交所
+const ETFExchangeSZ etfExchange = "SZ"   // 深交所
 
-// WithFundExchange 按交易所查询
-func WithFundExchange(exchange fundExchange) fundOpt {
+// WithETFExchange 按交易所查询
+func WithETFExchange(exchange etfExchange) etfOpt {
 	return func(args Args) {
 		args["exchange"] = exchange
 	}
