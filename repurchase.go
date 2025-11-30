@@ -77,17 +77,17 @@ func (cli *Client) Repurchase(opts ...repurchaseOpt) ([]Repurchase, error) {
 }
 
 // WithRepurchaseAnnDate 设置公告日期参数
-func WithRepurchaseAnnDate(date string) repurchaseOpt {
+func WithRepurchaseAnnDate(date time.Time) repurchaseOpt {
 	return func(args Args) {
-		args["ann_date"] = date
+		args["ann_date"] = date.Format("20060102")
 	}
 }
 
 // WithRepurchaseDateRange 设置公告日期范围参数
-func WithRepurchaseDateRange(start, end string) repurchaseOpt {
+func WithRepurchaseDateRange(start, end time.Time) repurchaseOpt {
 	return func(args Args) {
-		args["start_date"] = start
-		args["end_date"] = end
+		args["start_date"] = start.Format("20060102")
+		args["end_date"] = end.Format("20060102")
 	}
 }
 
