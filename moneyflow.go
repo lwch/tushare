@@ -113,30 +113,36 @@ func (cli *Client) MoneyFlow(opts ...moneyflowOpt) ([]MoneyFlow, error) {
 			idxNetMfAmt = i
 		}
 	}
+	toFloat := func(v any) float64 {
+		if v == nil {
+			return 0
+		}
+		return v.(float64)
+	}
 	items := make([]MoneyFlow, len(data))
 	for i, item := range data {
 		date, _ := time.ParseInLocation("20060102", item[idxDate].(string), time.Local)
 		items[i] = MoneyFlow{
 			Code:       item[idxCode].(string),
 			Date:       date,
-			BuySmVol:   item[idxBuySmVol].(float64),
-			BuySmAmt:   item[idxBuySmAmt].(float64),
-			SellSmVol:  item[idxSellSmVol].(float64),
-			SellSmAmt:  item[idxSellSmAmt].(float64),
-			BuyMdVol:   item[idxBuyMdVol].(float64),
-			BuyMdAmt:   item[idxBuyMdAmt].(float64),
-			SellMdVol:  item[idxSellMdVol].(float64),
-			SellMdAmt:  item[idxSellMdAmt].(float64),
-			BuyLgVol:   item[idxBuyLgVol].(float64),
-			BuyLgAmt:   item[idxBuyLgAmt].(float64),
-			SellLgVol:  item[idxSellLgVol].(float64),
-			SellLgAmt:  item[idxSellLgAmt].(float64),
-			BuyElgVol:  item[idxBuyElgVol].(float64),
-			BuyElgAmt:  item[idxBuyElgAmt].(float64),
-			SellElgVol: item[idxSellElgVol].(float64),
-			SellElgAmt: item[idxSellElgAmt].(float64),
-			NetMfVol:   item[idxNetMfVol].(float64),
-			NetMfAmt:   item[idxNetMfAmt].(float64),
+			BuySmVol:   toFloat(data[idxBuySmVol]),
+			BuySmAmt:   toFloat(data[idxBuySmAmt]),
+			SellSmVol:  toFloat(data[idxSellSmVol]),
+			SellSmAmt:  toFloat(data[idxSellSmAmt]),
+			BuyMdVol:   toFloat(data[idxBuyMdVol]),
+			BuyMdAmt:   toFloat(data[idxBuyMdAmt]),
+			SellMdVol:  toFloat(data[idxSellMdVol]),
+			SellMdAmt:  toFloat(data[idxSellMdAmt]),
+			BuyLgVol:   toFloat(data[idxBuyLgVol]),
+			BuyLgAmt:   toFloat(data[idxBuyLgAmt]),
+			SellLgVol:  toFloat(data[idxSellLgVol]),
+			SellLgAmt:  toFloat(data[idxSellLgAmt]),
+			BuyElgVol:  toFloat(data[idxBuyElgVol]),
+			BuyElgAmt:  toFloat(data[idxBuyElgAmt]),
+			SellElgVol: toFloat(data[idxSellElgVol]),
+			SellElgAmt: toFloat(data[idxSellElgAmt]),
+			NetMfVol:   toFloat(data[idxNetMfVol]),
+			NetMfAmt:   toFloat(data[idxNetMfAmt]),
 		}
 	}
 	return items, nil
