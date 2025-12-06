@@ -55,18 +55,21 @@ func (cli *Client) AdjFactorVip(opts ...adjustOpt) ([]Adjust, error) {
 	return cli.adjFactor("adj_factor_vip", opts...)
 }
 
+// WithAdjustCode 设置股票代码参数
 func WithAdjustCode(code string) adjustOpt {
 	return func(args Args) {
 		args["ts_code"] = code
 	}
 }
 
+// WithAdjustDate 设置交易日期参数
 func WithAdjustDate(date time.Time) adjustOpt {
 	return func(args Args) {
 		args["trade_date"] = date.Format("20060102")
 	}
 }
 
+// WithAdjustDateRange 设置日期范围参数
 func WithAdjustDateRange(start, end time.Time) adjustOpt {
 	return func(args Args) {
 		args["start_date"] = start.Format("20060102")
