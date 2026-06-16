@@ -7,8 +7,9 @@ import "time"
 type indexDailyOpt func(Args)
 
 // IndexDaily 指数日线行情
-func (cli *Client) IndexDaily(opts ...indexDailyOpt) ([]DailyTick, error) {
+func (cli *Client) IndexDaily(code string, opts ...indexDailyOpt) ([]DailyTick, error) {
 	args := make(Args)
+	args["ts_code"] = code
 	for _, o := range opts {
 		o(args)
 	}
@@ -76,13 +77,6 @@ func (cli *Client) IndexDaily(opts ...indexDailyOpt) ([]DailyTick, error) {
 		}
 	}
 	return items, nil
-}
-
-// WithIndexDailyCode 按指数代码查询
-func WithIndexDailyCode(code string) indexDailyOpt {
-	return func(args Args) {
-		args["ts_code"] = code
-	}
 }
 
 // WithIndexDailyDate 按交易日期查询
